@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.auth.center.springsecurity.dao.SysDictionariesMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.SysDictionaries">
+        <id column="DICTIONARIES_ID" property="dictionariesId" />
+        <result column="NAME" property="name" />
+        <result column="NAME_EN" property="nameEn" />
+        <result column="BIANMA" property="bianma" />
+        <result column="ORDER_BY" property="orderBy" />
+        <result column="PARENT_ID" property="parentId" />
+        <result column="BZ" property="bz" />
+        <result column="TBSNAME" property="tbsname" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        DICTIONARIES_ID AS dictionariesId, NAME AS name, NAME_EN AS nameEn, BIANMA AS bianma, ORDER_BY AS orderBy, PARENT_ID AS parentId, BZ AS bz, TBSNAME AS tbsname
+    </sql>
+
+</mapper>

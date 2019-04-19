@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.auth.center.springsecurity.dao.SysFhbuttonMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.SysFhbutton">
+        <id column="FHBUTTON_ID" property="fhbuttonId" />
+        <result column="NAME" property="name" />
+        <result column="QX_NAME" property="qxName" />
+        <result column="BZ" property="bz" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        FHBUTTON_ID AS fhbuttonId, NAME AS name, QX_NAME AS qxName, BZ AS bz
+    </sql>
+
+</mapper>

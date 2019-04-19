@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.auth.center.springsecurity.dao.SysLoginimgMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.SysLoginimg">
+        <id column="LOGINIMG_ID" property="loginimgId" />
+        <result column="NAME" property="name" />
+        <result column="FILEPATH" property="filepath" />
+        <result column="TYPE" property="type" />
+        <result column="FORDER" property="forder" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        LOGINIMG_ID AS loginimgId, NAME AS name, FILEPATH AS filepath, TYPE AS type, FORDER AS forder
+    </sql>
+
+</mapper>

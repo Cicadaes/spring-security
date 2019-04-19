@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.auth.center.springsecurity.dao.SysUserphotoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.SysUserphoto">
+        <id column="USERPHOTO_ID" property="userphotoId" />
+        <result column="USERNAME" property="username" />
+        <result column="PHOTO0" property="photo0" />
+        <result column="PHOTO1" property="photo1" />
+        <result column="PHOTO2" property="photo2" />
+        <result column="PHOTO3" property="photo3" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        USERPHOTO_ID AS userphotoId, USERNAME AS username, PHOTO0 AS photo0, PHOTO1 AS photo1, PHOTO2 AS photo2, PHOTO3 AS photo3
+    </sql>
+
+</mapper>

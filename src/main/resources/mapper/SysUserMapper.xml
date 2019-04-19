@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.auth.center.springsecurity.dao.SysUserMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.SysUser">
+        <id column="USER_ID" property="userId" />
+        <result column="USERNAME" property="username" />
+        <result column="PASSWORD" property="password" />
+        <result column="NAME" property="name" />
+        <result column="RIGHTS" property="rights" />
+        <result column="ROLE_ID" property="roleId" />
+        <result column="LAST_LOGIN" property="lastLogin" />
+        <result column="IP" property="ip" />
+        <result column="STATUS" property="status" />
+        <result column="BZ" property="bz" />
+        <result column="SKIN" property="skin" />
+        <result column="EMAIL" property="email" />
+        <result column="NUMBER" property="number" />
+        <result column="PHONE" property="phone" />
+        <result column="ENABLED" property="enabled" />
+        <result column="LASTPASSWORDRESETDATE" property="lastpasswordresetdate" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        USER_ID AS userId, USERNAME AS username, PASSWORD AS password, NAME AS name, RIGHTS AS rights, ROLE_ID AS roleId, LAST_LOGIN AS lastLogin, IP AS ip, STATUS AS status, BZ AS bz, SKIN AS skin, EMAIL AS email, NUMBER AS number, PHONE AS phone, ENABLED AS enabled, LASTPASSWORDRESETDATE AS lastpasswordresetdate
+    </sql>
+  <select id="findByUsername"
+    resultType="com.auth.center.springsecurity.common.model.SysUser">
+      SELECT <include refid="Base_Column_List"/> from SYS_USER WHERE USERNAME=#{username}
+
+  </select>
+
+</mapper>
