@@ -12,11 +12,20 @@
         <result column="MENU_ICON" property="menuIcon" />
         <result column="MENU_TYPE" property="menuType" />
         <result column="MENU_STATE" property="menuState" />
+        <collection column="MENU_ID" property="subMenu" ofType="com.auth.center.springsecurity.common.model.SysMenu" javaType="java.util.ArrayList" select="selectSubMenuById"/>
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        MENU_ID AS menuId, MENU_NAME AS menuName, MENU_URL AS menuUrl, PARENT_ID AS parentId, MENU_ORDER AS menuOrder, MENU_ICON AS menuIcon, MENU_TYPE AS menuType, MENU_STATE AS menuState
+        MENU_ID, MENU_NAME , MENU_URL , PARENT_ID , MENU_ORDER , MENU_ICON  , MENU_TYPE  , MENU_STATE
     </sql>
 
+    <!-- 根据前端页面传入的dept_id，查出所有部门 -->
+    <select id="listAllSysMenuQx" resultMap="BaseResultMap" >
+        select <include refid="Base_Column_List"/> from sys_menu WHERE PARENT_ID=#{menuId}
+    </select>
+    <!-- 再递归查询出一级部门下的所有子部门 -->
+    <select id="selectSubMenuById" resultMap="BaseResultMap" parameterType="string">
+    select <include refid="Base_Column_List"/> from SYS_MENU   where PARENT_ID = #{menuId}
+    </select>
 </mapper>

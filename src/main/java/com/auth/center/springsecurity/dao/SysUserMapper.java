@@ -2,6 +2,7 @@ package com.auth.center.springsecurity.dao;
 
 
 import com.auth.center.springsecurity.common.model.SysUser;
+import com.auth.center.springsecurity.common.model.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -16,4 +17,6 @@ import org.apache.ibatis.annotations.Param;
 public interface SysUserMapper extends BaseMapper<SysUser> {
 
     SysUser findByUsername(@Param("username")String username);
+
+    User getUserAndRoleById(String userId);
 }

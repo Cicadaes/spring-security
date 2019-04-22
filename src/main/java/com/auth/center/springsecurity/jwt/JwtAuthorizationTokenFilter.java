@@ -1,6 +1,7 @@
 package com.auth.center.springsecurity.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -50,6 +51,8 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
                 logger.error("an error occurred during getting username from token", e);
             } catch (ExpiredJwtException e) {
                 logger.warn("the token is expired and not valid anymore", e);
+            }catch (MalformedJwtException e) {
+                logger.warn("the token is expired and not valid anymore", e);
             }
         } else {
             logger.warn("couldn't find bearer string, will ignore the header");
@@ -59,8 +62,6 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             logger.debug("security context was null, so authorizing user");
 
-            // It is not compelling necessary to load the use details from the database. You could also store the information
-            // in the token and read it from it. It's up to you ;)            
             UserDetails userDetails;
             try {
                 userDetails = userDetailsService.loadUserByUsername(username);
@@ -69,9 +70,6 @@ public class JwtAuthorizationTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
-
-            // For simple validation it is completely sufficient to just check the token integrity. You don't have to call
-            // the database compellingly. Again it's up to you ;)
             if (jwtTokenUtil.validateToken(authToken, userDetails)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

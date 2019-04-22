@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * <p>
@@ -35,7 +36,33 @@ public class SysMenu extends Model<SysMenu> {
     private String menuType;
     @TableField("MENU_STATE")
     private Integer menuState;
+    private SysMenu parentMenu;
+    private List<SysMenu> subMenu;
+    private boolean hasMenu = false;
 
+    public SysMenu getParentMenu() {
+        return parentMenu;
+    }
+
+    public void setParentMenu(SysMenu parentMenu) {
+        this.parentMenu = parentMenu;
+    }
+
+    public List<SysMenu> getSubMenu() {
+        return subMenu;
+    }
+
+    public void setSubMenu(List<SysMenu> subMenu) {
+        this.subMenu = subMenu;
+    }
+
+    public boolean isHasMenu() {
+        return hasMenu;
+    }
+
+    public void setHasMenu(boolean hasMenu) {
+        this.hasMenu = hasMenu;
+    }
 
     public Integer getMenuId() {
         return menuId;
