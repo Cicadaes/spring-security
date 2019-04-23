@@ -1,5 +1,6 @@
 package com.auth.center.springsecurity.jwt;
 
+import com.auth.center.springsecurity.common.model.SysUser;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Clock;
 import io.jsonwebtoken.Jwts;
@@ -39,6 +40,12 @@ public class JwtTokenUtil implements Serializable {
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
     }
+    /**
+     * 获取私有的jwt claim
+     */
+    public String getPrivateClaimFromToken(String token, String key) {
+        return getAllClaimsFromToken(token).get(key).toString();
+    }
 
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = getAllClaimsFromToken(token);
@@ -65,14 +72,18 @@ public class JwtTokenUtil implements Serializable {
         return false;
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(SysUser sysUser) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        claims.put("user_id", sysUser.getUserId());
+        claims.put("rights",sysUser.getRights());
+        claims.put("role_id",sysUser.getRoleId());
+        return doGenerateToken(claims, sysUser.getName());
     }
 
     private String doGenerateToken(Map<String, Object> claims, String subject) {
         final Date createdDate = clock.now();
         final Date expirationDate = calculateExpirationDate(createdDate);
+
 
         return Jwts.builder()
             .setClaims(claims)
