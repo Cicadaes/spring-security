@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class MethodProtectedRestController {
 
-    private static final  String menuUrl = "menu.do"; //菜单地址(权限用)
+    private static final  String menuUrl = "menu/listAllMenu.do"; //菜单地址(权限用)
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
