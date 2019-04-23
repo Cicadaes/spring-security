@@ -3,9 +3,9 @@ package com.auth.center.springsecurity.controller;
 import com.auth.center.springsecurity.common.base.Const;
 import com.auth.center.springsecurity.common.handle.AuthenticationException;
 import com.auth.center.springsecurity.common.model.SysMenu;
-import com.auth.center.springsecurity.common.model.SysRole;
 import com.auth.center.springsecurity.common.model.SysUser;
 import com.auth.center.springsecurity.common.model.User;
+import com.auth.center.springsecurity.common.util.RedisUtils;
 import com.auth.center.springsecurity.common.util.RightsHelper;
 import com.auth.center.springsecurity.common.util.Tools;
 import com.auth.center.springsecurity.dao.SysUserMapper;
@@ -14,10 +14,9 @@ import com.auth.center.springsecurity.jwt.JwtTokenUtil;
 import com.auth.center.springsecurity.jwt.JwtUser;
 import com.auth.center.springsecurity.service.ISysMenuService;
 import com.auth.center.springsecurity.service.JwtAuthenticationResponse;
+import com.google.gson.Gson;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -50,10 +49,12 @@ public class AuthenticationRestController {
 
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
+    @Autowired
+    private RedisUtils redisUtils;
     @Autowired
     @Qualifier("jwtUserDetailsService")
     private UserDetailsService userDetailsService;
+    private final static Gson gson = new Gson();
 
     @Autowired
     private SysUserMapper sysUserMapper;
@@ -70,29 +71,10 @@ public class AuthenticationRestController {
         SysUser sysUser = sysUserMapper.findByUsername(authenticationRequest.getUsername());
 
         final String token = jwtTokenUtil.generateToken(sysUser);
-
-        User user = (User) session
-            .getAttribute(Const.SESSION_USER);            //读取session中的用户信息(单独用户信息)
-        if (user == null) {
-            User userr = (User) session
-                .getAttribute(Const.SESSION_USERROL);        //读取session中的用户信息(含角色信息)
-            if (null == userr) {
-                user = sysUserMapper
-                    .getUserAndRoleById(sysUser.getUserId());        //通过用户ID读取用户信息和角色信息
-                session.setAttribute(Const.SESSION_USERROL, user);            //存入session
-                String USERNAME = user.getUsername();
-                SysRole role = user.getSysRole();                          //获取用户角色
-                String roleRights = role != null ? role.getRights() : "";            //角色权限(菜单权限)
-                session
-                    .setAttribute(USERNAME + Const.SESSION_ROLE_RIGHTS,
-                        roleRights);  //将角色权限存入session
-                session.setAttribute(Const.SESSION_USERNAME, USERNAME);            //放入用户名到session
-                if (null == session.getAttribute(USERNAME + Const.SESSION_QX)) {
-                    session.setAttribute(USERNAME + Const.SESSION_QX,
-                        this.getUQX(USERNAME));//按钮权限放到session中
-                }
-            }
-        }
+        //通过用户ID读取用户信息和角色信息
+        User user = sysUserMapper.getUserAndRoleById(sysUser.getUserId());
+        redisUtils.set(Const.USER_ROLE + sysUser.getUserId(), user);
+        getAttributeSysMenu("Bearer " + token);
         return ResponseEntity.ok(new JwtAuthenticationResponse(token));
     }
 
@@ -131,30 +113,38 @@ public class AuthenticationRestController {
     }
 
     /**菜单缓存
-     * @param session
-     * @param token
+     * @param tokenHeader
      * @return
      * @throws Exception
      */
     @RequestMapping("/listMenu")
-    public List<SysMenu> getAttributeSysMenu(HttpSession session,
+    public List<SysMenu> getAttributeSysMenu(
         @NotNull @RequestHeader("Authorization") String tokenHeader) {
         List<SysMenu> allmenuList = new ArrayList<SysMenu>();
-//        if(null == session.getAttribute(userName + Const.SESSION_allmenuList)){
+
         String token = tokenHeader.substring(7);
         allmenuList = sysMenuService.listAllSysMenuQx("0");              //获取所有菜单
-        String user_id = jwtTokenUtil.getPrivateClaimFromToken(token, "user_id");
         String roleRights = jwtTokenUtil.getPrivateClaimFromToken(token, "rights");
-        String role_id = jwtTokenUtil.getPrivateClaimFromToken(token, "role_id");
-
+        String userId = jwtTokenUtil.getPrivateClaimFromToken(token, "user_id");
         if (Tools.notEmpty(roleRights)) {
             allmenuList = this.readSysMenu(allmenuList, roleRights);        //根据角色权限获取本权限的菜单列表
         }
-//        session.setAttribute(userName + Const.SESSION_allmenuList, allmenuList);//菜单权限放入session中
-//        }else{
-//            allmenuList = (List<SysMenu>)session.getAttribute(userName + Const.SESSION_allmenuList);
-//        }
+        //清空缓存
+        redisUtils.del(Const.USER_MENU + userId);
+        refreshMenu(allmenuList, userId);
         return allmenuList;
+    }
+
+    private void refreshMenu(List<SysMenu> allmenuList, String userId) {
+        if (allmenuList != null && allmenuList.size() > 0) {
+            for (int i = 0; i < allmenuList.size(); i++) {
+                String url=allmenuList.get(i).getMenuUrl().split(".do")[0];
+
+                redisUtils.hset(Const.USER_MENU + userId, url,
+                    gson.toJson(allmenuList.get(i).getMenuId()));
+                refreshMenu(allmenuList.get(i).getSubMenu(),userId);
+            }
+        }
     }
 
     /**根据角色权限获取本权限的菜单列表(递归处理)
@@ -173,34 +163,5 @@ public class AuthenticationRestController {
         return menuList;
     }
 
-    /**获取用户权限
-     * @param USERNAME
-     * @return
-     */
-    public Map<String, String> getUQX(String USERNAME) {
-//        PageData pd = new PageData();
-        Map<String, String> map = new HashMap<String, String>();
-//        try {
-//            pd.put(Const.SESSION_USERNAME, USERNAME);
-//            pd.put("ROLE_ID", userService.findByUsername(pd).get("ROLE_ID").toString());//获取角色ID
-//            pd = roleService.findObjectById(pd);										//获取角色信息
-//            map.put("adds", pd.getString("ADD_QX"));	//增
-//            map.put("dels", pd.getString("DEL_QX"));	//删
-//            map.put("edits", pd.getString("EDIT_QX"));	//改
-//            map.put("chas", pd.getString("CHA_QX"));	//查
-//            List<PageData> buttonQXnamelist = new ArrayList<PageData>();
-//            if("admin".equals(USERNAME)){
-//                buttonQXnamelist = fhbuttonService.listAll(pd);					//admin用户拥有所有按钮权限
-//            }else{
-//                buttonQXnamelist = buttonrightsService.listAllBrAndQxname(pd);	//此角色拥有的按钮权限标识列表
-//            }
-//            for(int i=0;i<buttonQXnamelist.size();i++){
-//                map.put(buttonQXnamelist.get(i).getString("QX_NAME"),"1");		//按钮权限
-//            }
-//        } catch (Exception e) {
-//            logger.error(e.toString(), e);
-//        }
-        return map;
-    }
 
 }

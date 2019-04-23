@@ -1,24 +1,33 @@
 package com.auth.center.springsecurity.controller;
 
+import com.auth.center.springsecurity.common.util.Jurisdiction;
+import com.auth.center.springsecurity.jwt.JwtTokenUtil;
+import javax.validation.constraints.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("protected")
 public class MethodProtectedRestController {
 
-    /**
-     * This is an example of some different kinds of granular restriction for endpoints. You can use the built-in SPEL expressions
-     * in @PreAuthorize such as 'hasRole()' to determine if a user has access. Remember that the hasRole expression assumes a
-     * 'ROLE_' prefix on all role names. So 'ADMIN' here is actually stored as 'ROLE_ADMIN' in database!
-     **/
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<?> getProtectedGreeting() {
+    private static final  String menuUrl = "menu.do"; //菜单地址(权限用)
 
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
 
-        return ResponseEntity.ok("Greetings from admin protected method!");
+    @Autowired
+    private Jurisdiction jurisdiction;
+
+    @RequestMapping("menu")
+    public ResponseEntity<?> getProtectedGreeting(@NotNull @RequestHeader("Authorization") String tokenHeader) {
+        String token = tokenHeader.substring(7);
+        String userId = jwtTokenUtil.getPrivateClaimFromToken(token, "user_id");
+        if (!jurisdiction.buttonJurisdiction(menuUrl, userId)) {
+            return ResponseEntity.ok("没有权限访问!");
+        }
+        return ResponseEntity.ok("hello menu!");
     }
 
 }
