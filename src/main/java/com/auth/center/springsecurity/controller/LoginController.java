@@ -1,6 +1,6 @@
 package com.auth.center.springsecurity.controller;
 
-import com.auth.center.springsecurity.common.base.Const;
+import com.auth.center.springsecurity.common.base.Constant;
 import com.auth.center.springsecurity.common.handler.AuthenticationException;
 import com.auth.center.springsecurity.common.model.R;
 import com.auth.center.springsecurity.common.model.SysMenu;
@@ -73,7 +73,7 @@ public class LoginController {
         final String token = jwtTokenUtil.generateToken(sysUser);
         //通过用户ID读取用户信息和角色信息
         User user = sysUserMapper.getUserAndRoleById(sysUser.getUserId());
-        redisUtils.set(Const.USER_ROLE + sysUser.getUserId(), user);
+        redisUtils.set(Constant.USER_ROLE + sysUser.getUserId(), user);
         getAttributeSysMenu("Bearer " + token);
         return R.ok(token);
     }
@@ -132,7 +132,7 @@ public class LoginController {
             allmenuList = this.readSysMenu(allmenuList, roleRights);        //根据角色权限获取本权限的菜单列表
         }
         //清空缓存
-        redisUtils.del(Const.USER_MENU + userId);
+        redisUtils.del(Constant.USER_MENU + userId);
         refreshMenu(allmenuList, userId);
         return new R(allmenuList);
     }
@@ -142,7 +142,7 @@ public class LoginController {
             for (int i = 0; i < allmenuList.size(); i++) {
                 if(allmenuList.get(i).isHasMenu()){
                     String url = allmenuList.get(i).getMenuUrl().split(".do")[0];
-                    redisUtils.hset(Const.USER_MENU + userId, url,
+                    redisUtils.hset(Constant.USER_MENU + userId, url,
                         gson.toJson(allmenuList.get(i).getMenuId()));
                     refreshMenu(allmenuList.get(i).getSubMenu(), userId);
                 }
