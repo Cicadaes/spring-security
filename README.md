@@ -9,7 +9,7 @@ POST http://localhost:8080/auth
 ```
 ## 获取登录人菜单权限
 
-POST http://localhost:8080/listMenu
+POST http://localhost:8080/refreshQx
 
 Authorization  Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwidXNlcl9pZCI6IjgiLCJyb2xlX2lkIjoiMiIsInJpZ2h0cyI6IjExMzM2NzEwNTUzMjEwNTUyNTgzNzQ3MDc5ODA5NDUyMTg5MzM4MDMyNjk4NjQ3NjI3NDM1OTQ2NDI1NzEyOTQiLCJleHAiOjE1NTY1OTM1NjAsImlhdCI6MTU1NTk4ODc2MH0.afcHDC7aOSQQtnFDnmeJtAGS3_Q3U-yG19S1YlImcH3bgfJjMxkbZhmelIbOHjPvKQ0DeXZRT0kr_8kkpgVeLg
 Head 增加请求头信息
@@ -31,5 +31,7 @@ Head 增加请求头信息
 key : Authorization 
 value: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwidXNlcl9pZCI6IjgiLCJyb2xlX2lkIjoiMiIsInJpZ2h0cyI6IjExMzM2NzEwNTUzMjEwNTUyNTgzNzQ3MDc5ODA5NDUyMTg5MzM4MDMyNjk4NjQ3NjI3NDM1OTQ2NDI1NzEyOTQiLCJleHAiOjE1NTY1OTM1NjAsImlhdCI6MTU1NTk4ODc2MH0.afcHDC7aOSQQtnFDnmeJtAGS3_Q3U-yG19S1YlImcH3bgfJjMxkbZhmelIbOHjPvKQ0DeXZRT0kr_8kkpgVeLg
 ```
+## 权限拦截
 
+  参考MenuController
 

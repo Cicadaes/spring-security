@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -120,7 +119,7 @@ public class LoginController {
      * @return
      * @throws Exception
      */
-    @RequestMapping("/listMenu")
+    @RequestMapping("/refreshQx")
     public R getAttributeSysMenu(
         @NotNull @RequestHeader("Authorization") String tokenHeader) {
         List<SysMenu> allmenuList = new ArrayList<SysMenu>();
