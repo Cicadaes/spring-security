@@ -16,8 +16,8 @@ public class RRExceptionHandler {
 	/**
 	 * 处理自定义异常
 	 */
-	@ExceptionHandler(RRException.class)
-	public R handleRRException(RRException e){
+	@ExceptionHandler(RException.class)
+	public R handleRRException(RException e){
 
 		return R.error(e.getCode()+"",e.getMsg());
 	}
