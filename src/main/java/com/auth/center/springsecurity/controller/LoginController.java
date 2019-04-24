@@ -64,7 +64,7 @@ public class LoginController {
 
     @RequestMapping(value = "/auth", method = RequestMethod.POST)
     public R createAuthenticationToken(
-        @RequestBody JwtAuthenticationRequest authenticationRequest, HttpSession session)
+        @RequestBody JwtAuthenticationRequest authenticationRequest)
         throws AuthenticationException {
 
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());

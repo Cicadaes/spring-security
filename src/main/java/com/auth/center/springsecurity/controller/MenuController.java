@@ -25,7 +25,7 @@ public class MenuController {
         String token = tokenHeader.substring(7);
         String userId = jwtTokenUtil.getPrivateClaimFromToken(token, "user_id");
         if (!jurisdiction.buttonJurisdiction(menuUrl, userId)) {
-            return R.error("没有权限访问!");
+            return R.error("401","没有权限访问!");
         }
         return R.ok("hello menu!");
     }
