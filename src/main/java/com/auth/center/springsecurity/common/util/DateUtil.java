@@ -547,7 +547,7 @@ public class DateUtil {
     public static void main(String[] args) throws Exception {
 
         System.out.println(new Date(1543729702334L));
-//        BWJsonResult result = new BWJsonResult("2323");
+//        R result = new R("2323");
 //        System.out.println(JSONObject.toJSONString(result));
 //        System.out.println(result.getData());
 //        if(result.getData()!=null){

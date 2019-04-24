@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class UserRestController {
+public class UserController {
 
     @Value("${jwt.header}")
     private String tokenHeader;

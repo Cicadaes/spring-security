@@ -1,5 +1,6 @@
-package com.auth.center.springsecurity.config;
+package com.auth.center.springsecurity.common.handler;
 
+import com.auth.center.springsecurity.common.model.R;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ public class MyAccessDeniedHandler implements AccessDeniedHandler {
         httpServletResponse.setCharacterEncoding("UTF-8");
         httpServletResponse.setContentType("application/json");
 
-        httpServletResponse.getWriter().println("{\"code\":403,\"message\":\"你没有权限访问！\",\"data\":\"\"}");
+        httpServletResponse.getWriter().println(R.error("403","你没有权限访问！"));
         httpServletResponse.getWriter().flush();
     }
 }

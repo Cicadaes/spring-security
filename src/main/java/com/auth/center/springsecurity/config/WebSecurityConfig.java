@@ -1,6 +1,7 @@
 package com.auth.center.springsecurity.config;
 
-import com.auth.center.springsecurity.jwt.JwtAuthenticationEntryPoint;
+import com.auth.center.springsecurity.common.handler.EntryPointUnauthorizedHandler;
+import com.auth.center.springsecurity.common.handler.MyAccessDeniedHandler;
 import com.auth.center.springsecurity.jwt.JwtAuthorizationTokenFilter;
 import com.auth.center.springsecurity.service.JwtUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private JwtAuthenticationEntryPoint unauthorizedHandler;
+    private EntryPointUnauthorizedHandler entryPointUnauthorizedHandler;
 
     @Autowired
     private JwtUserDetailsService jwtUserDetailsService;
+    @Autowired
+    private MyAccessDeniedHandler myAccessDeniedHandler;
 
     // Custom JWT based security filter
     @Autowired
@@ -64,19 +67,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         httpSecurity
             // we don't need CSRF because our token is invulnerable
             .csrf().disable()
-
-            .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-
-            // don't create session
+            .exceptionHandling().accessDeniedHandler(myAccessDeniedHandler).and()
+            .exceptionHandling().authenticationEntryPoint(entryPointUnauthorizedHandler).and()
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-
             .authorizeRequests()
-
-            // Un-secure H2 Database
-            .antMatchers("/h2-console/**/**").permitAll()
-
             .antMatchers("/auth/**").permitAll()
-            .antMatchers("/login/**").permitAll()
             .anyRequest().authenticated();
 
        httpSecurity
@@ -85,7 +80,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         // disable page caching
         httpSecurity
             .headers()
-            .frameOptions().sameOrigin()  // required to set for H2 else H2 Console will be blank.
+            .frameOptions().sameOrigin()
             .cacheControl();
     }
 
@@ -109,12 +104,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 "/favicon.ico",
                 "/**/*.html",
                 "/**/*.css",
-                "/**/*.js"
-            )
-
-            // Un-secure H2 Database (for testing purposes, H2 console shouldn't be unprotected in production)
-            .and()
-            .ignoring()
-            .antMatchers("/h2-console/**/**");
+                "/**/*.js");
     }
 }

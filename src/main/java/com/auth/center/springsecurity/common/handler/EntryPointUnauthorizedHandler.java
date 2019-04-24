@@ -1,5 +1,6 @@
-package com.auth.center.springsecurity.config;
+package com.auth.center.springsecurity.common.handler;
 
+import com.auth.center.springsecurity.common.model.R;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -31,7 +32,7 @@ public class EntryPointUnauthorizedHandler implements AuthenticationEntryPoint {
       httpServletResponse.setCharacterEncoding("UTF-8");
       httpServletResponse.setContentType("application/json");
 
-      httpServletResponse.getWriter().println("{\"code\":401,\"message\":\"你没有携带 token 或者 token 无效！\",\"data\":\"\"}");
+      httpServletResponse.getWriter().println(R.error("401","你没有携带 token 或者 token 无效！"));
       httpServletResponse.getWriter().flush();
   }
 

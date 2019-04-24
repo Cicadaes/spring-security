@@ -1,7 +1,8 @@
 package com.auth.center.springsecurity.controller;
 
 import com.auth.center.springsecurity.common.base.Const;
-import com.auth.center.springsecurity.common.handle.AuthenticationException;
+import com.auth.center.springsecurity.common.handler.AuthenticationException;
+import com.auth.center.springsecurity.common.model.R;
 import com.auth.center.springsecurity.common.model.SysMenu;
 import com.auth.center.springsecurity.common.model.SysUser;
 import com.auth.center.springsecurity.common.model.User;
@@ -13,7 +14,6 @@ import com.auth.center.springsecurity.jwt.JwtAuthenticationRequest;
 import com.auth.center.springsecurity.jwt.JwtTokenUtil;
 import com.auth.center.springsecurity.jwt.JwtUser;
 import com.auth.center.springsecurity.service.ISysMenuService;
-import com.auth.center.springsecurity.service.JwtAuthenticationResponse;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,7 +40,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class AuthenticationRestController {
+public class LoginController {
 
     @Value("${jwt.header}")
     private String tokenHeader;
@@ -62,7 +63,7 @@ public class AuthenticationRestController {
     private ISysMenuService sysMenuService;
 
     @RequestMapping(value = "/auth", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(
+    public R createAuthenticationToken(
         @RequestBody JwtAuthenticationRequest authenticationRequest, HttpSession session)
         throws AuthenticationException {
 
@@ -75,11 +76,11 @@ public class AuthenticationRestController {
         User user = sysUserMapper.getUserAndRoleById(sysUser.getUserId());
         redisUtils.set(Const.USER_ROLE + sysUser.getUserId(), user);
         getAttributeSysMenu("Bearer " + token);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(token));
+        return R.ok(token);
     }
 
     @RequestMapping(value = "/refresh", method = RequestMethod.GET)
-    public ResponseEntity<?> refreshAndGetAuthenticationToken(HttpServletRequest request) {
+    public R refreshAndGetAuthenticationToken(HttpServletRequest request) {
         String authToken = request.getHeader(tokenHeader);
         final String token = authToken.substring(7);
         String username = jwtTokenUtil.getUsernameFromToken(token);
@@ -87,9 +88,9 @@ public class AuthenticationRestController {
 
         if (jwtTokenUtil.canTokenBeRefreshed(token, user.getLastPasswordResetDate())) {
             String refreshedToken = jwtTokenUtil.refreshToken(token);
-            return ResponseEntity.ok(new JwtAuthenticationResponse(refreshedToken));
+            return R.ok(refreshedToken);
         } else {
-            return ResponseEntity.badRequest().body(null);
+            return R.error("无法刷新,token无效或用户密码近期修改过");
         }
     }
 
@@ -109,6 +110,8 @@ public class AuthenticationRestController {
             throw new AuthenticationException("用户已被禁用!", e);
         } catch (BadCredentialsException e) {
             throw new AuthenticationException("账号密码错误!", e);
+        } catch (LockedException e) {
+            throw new AuthenticationException("当用户被锁定!", e);
         }
     }
 
@@ -118,7 +121,7 @@ public class AuthenticationRestController {
      * @throws Exception
      */
     @RequestMapping("/listMenu")
-    public List<SysMenu> getAttributeSysMenu(
+    public R getAttributeSysMenu(
         @NotNull @RequestHeader("Authorization") String tokenHeader) {
         List<SysMenu> allmenuList = new ArrayList<SysMenu>();
 
@@ -132,17 +135,18 @@ public class AuthenticationRestController {
         //清空缓存
         redisUtils.del(Const.USER_MENU + userId);
         refreshMenu(allmenuList, userId);
-        return allmenuList;
+        return new R(allmenuList);
     }
 
     private void refreshMenu(List<SysMenu> allmenuList, String userId) {
         if (allmenuList != null && allmenuList.size() > 0) {
             for (int i = 0; i < allmenuList.size(); i++) {
-                String url=allmenuList.get(i).getMenuUrl().split(".do")[0];
-
-                redisUtils.hset(Const.USER_MENU + userId, url,
-                    gson.toJson(allmenuList.get(i).getMenuId()));
-                refreshMenu(allmenuList.get(i).getSubMenu(),userId);
+                if(allmenuList.get(i).isHasMenu()){
+                    String url = allmenuList.get(i).getMenuUrl().split(".do")[0];
+                    redisUtils.hset(Const.USER_MENU + userId, url,
+                        gson.toJson(allmenuList.get(i).getMenuId()));
+                    refreshMenu(allmenuList.get(i).getSubMenu(), userId);
+                }
             }
         }
     }
@@ -154,6 +158,9 @@ public class AuthenticationRestController {
      */
     public List<SysMenu> readSysMenu(List<SysMenu> menuList, String roleRights) {
         for (int i = 0; i < menuList.size(); i++) {
+            if (menuList.get(i).getMenuUrl().equalsIgnoreCase("menu/listAllMenu")) {
+                continue;
+            }
             menuList.get(i)
                 .setHasMenu(RightsHelper.testRights(roleRights, menuList.get(i).getMenuId()));
             if (menuList.get(i).isHasMenu()) {    //判断是否有此菜单权限
