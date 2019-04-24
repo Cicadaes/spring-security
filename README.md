@@ -1,5 +1,9 @@
 # spring-security
 
+1、导入db下脚本；
+2、修改mysql redis 配置信息
+3、启动 SpringSecurityApplication
+
 ## 登录，获取token
 
 POST http://localhost:8080/auth

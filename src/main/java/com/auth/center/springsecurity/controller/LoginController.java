@@ -157,9 +157,9 @@ public class LoginController {
      */
     public List<SysMenu> readSysMenu(List<SysMenu> menuList, String roleRights) {
         for (int i = 0; i < menuList.size(); i++) {
-            if (menuList.get(i).getMenuUrl().equalsIgnoreCase("menu/listAllMenu")) {
-                continue;
-            }
+//            if (menuList.get(i).getMenuUrl().equalsIgnoreCase("menu/listAllMenu")) {
+//                continue;
+//            }
             menuList.get(i)
                 .setHasMenu(RightsHelper.testRights(roleRights, menuList.get(i).getMenuId()));
             if (menuList.get(i).isHasMenu()) {    //判断是否有此菜单权限
