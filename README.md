@@ -35,3 +35,4 @@ value: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ1c2VyIiwidXNlcl9pZCI6IjgiLCJyb2xlX
 
   参考MenuController
 
+通过增加注解    @Permit(url=menuUrl)；指定登录人需要有哪个链接权限；
