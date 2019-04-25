@@ -38,13 +38,6 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
  * <li>BrowserSecure : 含义</li>
  * <li>IgnoreNonFieldGetter : 含义</li>
  * <li>WriteEnumUsingName : 含义</li>
- * 
- * </ul>
- * date: 2017年10月20日 上午10:36:46 <br/>
- *
- * @author wuyuegang
- * @version
- * @since JDK 1.8
  */
 public abstract class BaseJsonModel
 {
