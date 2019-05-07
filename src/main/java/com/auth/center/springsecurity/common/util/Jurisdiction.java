@@ -1,6 +1,7 @@
 package com.auth.center.springsecurity.common.util;
 
 import com.auth.center.springsecurity.common.base.Constant;
+import java.math.BigInteger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -26,5 +27,14 @@ public class Jurisdiction {
         return true;
 
     }
+
+    public static void main(String[] args)
+    {
+
+        BigInteger s=new BigInteger(String.valueOf(Integer.MAX_VALUE));
+        System.out.println(s);
+        System.out.println(Integer.toBinaryString(s.intValue()));
+    }
+
 
 }

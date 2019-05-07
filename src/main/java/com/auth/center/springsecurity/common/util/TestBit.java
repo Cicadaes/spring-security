@@ -33,16 +33,16 @@ public class TestBit {
 //            System.out.println(i+" values: "+Integer.toBinaryString(i));
 //        }
 
-        String muleId="1,2,36,37,39,38,43,3,40,41,42,9,44,62,61,53,8,6,7,51,52,54,55,57,56,58,22,23,24,30,31,33,45,47,46,34,32,35";
-
-        BigInteger rights=RightsHelper.sumRights(Tools.str2StrArray(muleId.trim(),","));
-        System.out.println(rights);
-
-        System.out.println(new BigInteger("36").testBit(0));
-        System.out.println(new BigInteger("36").testBit(1));
+//        String muleId="1,2,36,37,39,38,43,3,40,41,42,9,44,62,61,53,8,6,7,51,52,54,55,57,56,58,22,23,24,30,31,33,45,47,46,34,32,35";
+//
+//        BigInteger rights=RightsHelper.sumRights(Tools.str2StrArray(muleId.trim(),","));
+//        System.out.println(rights);
+//
+//        System.out.println(new BigInteger("36").testBit(0));
+//        System.out.println(new BigInteger("36").testBit(1));
         BigInteger b1=new BigInteger("0");
-        System.out.println(b1=b1.setBit(1));
-        System.out.println(b1=b1.setBit(2));
-        System.out.println(b1.setBit(3));
+//        System.out.println(b1=b1.setBit(1));
+//        System.out.println(b1=b1.setBit(2));
+        System.out.println(b1.setBit(10000));
     }
 }

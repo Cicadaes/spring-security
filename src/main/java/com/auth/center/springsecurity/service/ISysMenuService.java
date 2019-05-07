@@ -1,6 +1,7 @@
 package com.auth.center.springsecurity.service;
 
 import com.auth.center.springsecurity.common.model.SysMenu;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
@@ -14,5 +15,6 @@ import java.util.List;
  */
 public interface ISysMenuService extends IService<SysMenu> {
 
-    List<SysMenu> listAllSysMenuQx(String s);
+    List<SysMenu> listAllSysMenuQx(String s,
+        Page page);
 }

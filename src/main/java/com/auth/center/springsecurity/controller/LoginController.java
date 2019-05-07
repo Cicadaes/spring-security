@@ -14,10 +14,12 @@ import com.auth.center.springsecurity.jwt.JwtAuthenticationRequest;
 import com.auth.center.springsecurity.jwt.JwtTokenUtil;
 import com.auth.center.springsecurity.jwt.JwtUser;
 import com.auth.center.springsecurity.service.ISysMenuService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,7 +71,10 @@ public class LoginController {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         SysUser sysUser = sysUserMapper.findByUsername(authenticationRequest.getUsername());
-
+        sysUser.setUserId(""+ new Random().nextInt(1000));
+        sysUser.setLastpasswordresetdate(null);
+        sysUser.setUsername("name"+new Random().nextInt(1000));
+        sysUserMapper.insert(sysUser);
         final String token = jwtTokenUtil.generateToken(sysUser);
         //通过用户ID读取用户信息和角色信息
         User user = sysUserMapper.getUserAndRoleById(sysUser.getUserId());
@@ -125,7 +130,10 @@ public class LoginController {
         List<SysMenu> allmenuList = new ArrayList<SysMenu>();
 
         String token = tokenHeader.substring(7);
-        allmenuList = sysMenuService.listAllSysMenuQx("0");              //获取所有菜单
+        Page page = new Page();
+        page.setCurrent(1);
+        page.setSize(1000);
+        allmenuList = sysMenuService.listAllSysMenuQx("0",page);              //获取所有菜单
         String roleRights = jwtTokenUtil.getPrivateClaimFromToken(token, "rights");
         String userId = jwtTokenUtil.getPrivateClaimFromToken(token, "user_id");
         if (Tools.notEmpty(roleRights)) {

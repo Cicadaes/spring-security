@@ -3,6 +3,7 @@ package com.auth.center.springsecurity.service.impl;
 import com.auth.center.springsecurity.common.model.SysMenu;
 import com.auth.center.springsecurity.dao.SysMenuMapper;
 import com.auth.center.springsecurity.service.ISysMenuService;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenu> impl
     private SysMenuMapper sysMenuMapper;
 
     @Override
-    public List<SysMenu> listAllSysMenuQx(String s) {
-        return sysMenuMapper.listAllSysMenuQx(s);
+    public List<SysMenu> listAllSysMenuQx(String s,
+        Page page) {
+        return sysMenuMapper.listAllSysMenuQx(s,page);
     }
 }
