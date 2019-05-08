@@ -3,6 +3,8 @@ package com.auth.center.springsecurity.dao;
 
 import com.auth.center.springsecurity.common.model.SysStatistics;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -14,4 +16,5 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SysStatisticsMapper extends BaseMapper<SysStatistics> {
 
+    List<SysStatistics> searchByParam(Map map);
 }

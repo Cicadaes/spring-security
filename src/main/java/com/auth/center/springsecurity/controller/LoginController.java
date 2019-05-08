@@ -4,11 +4,13 @@ import com.auth.center.springsecurity.common.base.Constant;
 import com.auth.center.springsecurity.common.handler.AuthenticationException;
 import com.auth.center.springsecurity.common.model.R;
 import com.auth.center.springsecurity.common.model.SysMenu;
+import com.auth.center.springsecurity.common.model.SysStatistics;
 import com.auth.center.springsecurity.common.model.SysUser;
 import com.auth.center.springsecurity.common.model.User;
 import com.auth.center.springsecurity.common.util.RedisUtils;
 import com.auth.center.springsecurity.common.util.RightsHelper;
 import com.auth.center.springsecurity.common.util.Tools;
+import com.auth.center.springsecurity.dao.SysStatisticsMapper;
 import com.auth.center.springsecurity.dao.SysUserMapper;
 import com.auth.center.springsecurity.jwt.JwtAuthenticationRequest;
 import com.auth.center.springsecurity.jwt.JwtTokenUtil;
@@ -17,11 +19,15 @@ import com.auth.center.springsecurity.service.ISysMenuService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.gson.Gson;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,6 +49,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class LoginController {
 
+    private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+
+
     @Value("${jwt.header}")
     private String tokenHeader;
 
@@ -57,11 +66,12 @@ public class LoginController {
     @Qualifier("jwtUserDetailsService")
     private UserDetailsService userDetailsService;
     private final static Gson gson = new Gson();
-
     @Autowired
     private SysUserMapper sysUserMapper;
     @Autowired
     private ISysMenuService sysMenuService;
+    @Autowired
+    private SysStatisticsMapper sysStatisticsMapper;
 
     @RequestMapping(value = "/auth", method = RequestMethod.POST)
     public R createAuthenticationToken(
@@ -71,10 +81,19 @@ public class LoginController {
         authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
         SysUser sysUser = sysUserMapper.findByUsername(authenticationRequest.getUsername());
-        sysUser.setUserId(""+ new Random().nextInt(1000));
+
+        //插入字段默认时间
+        sysUser.setUserId("" + new Random().nextInt(1000));
         sysUser.setLastpasswordresetdate(null);
-        sysUser.setUsername("name"+new Random().nextInt(1000));
+        sysUser.setUsername("name" + new Random().nextInt(1000));
         sysUserMapper.insert(sysUser);
+        //根据日期查询转换
+        Map map = new HashMap<>();
+        map.put("cdate", "2019-01-01");
+        map.put("ctime", "2019-01-02 03:04:16");
+        List<SysStatistics> rst = sysStatisticsMapper.searchByParam(map);
+        logger.info(String.valueOf(rst.size()));
+
         final String token = jwtTokenUtil.generateToken(sysUser);
         //通过用户ID读取用户信息和角色信息
         User user = sysUserMapper.getUserAndRoleById(sysUser.getUserId());
@@ -133,7 +152,7 @@ public class LoginController {
         Page page = new Page();
         page.setCurrent(1);
         page.setSize(1000);
-        allmenuList = sysMenuService.listAllSysMenuQx("0",page);              //获取所有菜单
+        allmenuList = sysMenuService.listAllSysMenuQx("0", page);              //获取所有菜单
         String roleRights = jwtTokenUtil.getPrivateClaimFromToken(token, "rights");
         String userId = jwtTokenUtil.getPrivateClaimFromToken(token, "user_id");
         if (Tools.notEmpty(roleRights)) {
@@ -148,7 +167,7 @@ public class LoginController {
     private void refreshMenu(List<SysMenu> allmenuList, String userId) {
         if (allmenuList != null && allmenuList.size() > 0) {
             for (int i = 0; i < allmenuList.size(); i++) {
-                if(allmenuList.get(i).isHasMenu()){
+                if (allmenuList.get(i).isHasMenu()) {
                     String url = allmenuList.get(i).getMenuUrl().split(".do")[0];
                     redisUtils.hset(Constant.USER_MENU + userId, url,
                         gson.toJson(allmenuList.get(i).getMenuId()));

@@ -6,6 +6,7 @@ import com.auth.center.springsecurity.plugins.utils.PluginUtil;
 import com.auth.center.springsecurity.plugins.utils.StringUtil;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
@@ -50,8 +51,9 @@ import org.slf4j.LoggerFactory;
  * @author lqq
  */
 @Intercepts({@Signature(type = StatementHandler.class,
-        method = "prepare", args = {Connection.class, Integer.class}),
-        @Signature(type = ParameterHandler.class, method = "setParameters", args = {PreparedStatement.class})
+    method = "prepare", args = {Connection.class, Integer.class}),
+    @Signature(type = ParameterHandler.class, method = "setParameters", args = {
+        PreparedStatement.class})
 })
 public class ConvertSqlInterceptor implements Interceptor {
 
@@ -71,24 +73,22 @@ public class ConvertSqlInterceptor implements Interceptor {
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
+
         if (METHOD_PREPARE.equals(invocation.getMethod().getName())) {
-            DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.getDefault());
-            final String currentDate = dateFormat.format(new Date());
-            StatementHandler handler = (StatementHandler) PluginUtil.processTarget(invocation.getTarget());
+            StatementHandler handler = (StatementHandler) PluginUtil
+                .processTarget(invocation.getTarget());
             MetaObject metaObject = SystemMetaObject.forObject(handler);
             MappedStatement ms = (MappedStatement) metaObject.getValue("delegate.mappedStatement");
             SqlCommandType sqlCommandType = ms.getSqlCommandType();
             String sql = metaObject.getValue("delegate.boundSql.sql").toString();
-            Connection connection = (Connection) invocation.getArgs()[0];
-            DbType dbType = JdbcUtils.getDbType(connection.getMetaData().getURL());
-
             Statement statement = CCJSqlParserUtil.parse(sql);
-            logger.info("jdbc type :{},intercept 原始sql :{} ",dbType, sql);
+            DateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN, Locale.getDefault());
+            final String currentDate = dateFormat.format(new Date());
             if (SqlCommandType.INSERT == sqlCommandType) {
                 Insert insert = (Insert) statement;
                 if (!matchesIgnoreTables(insert.getTable().getName())) {
                     boolean isContainsCreateDateColumn = false;
-                    int createDateColumnIndex = 0, modifyDateColumnIndex = 0;
+                    int createDateColumnIndex = 0;
                     for (int i = 0; i < insert.getColumns().size(); i++) {
                         Column column = insert.getColumns().get(i);
                         if (column.getColumnName().equals(createDateColumnName)) {
@@ -134,8 +134,13 @@ public class ConvertSqlInterceptor implements Interceptor {
                     }
                 }
             }
+            if (SqlCommandType.UPDATE == sqlCommandType || SqlCommandType.SELECT == sqlCommandType
+                || SqlCommandType.DELETE == sqlCommandType) {
+                sqlconvert(invocation, metaObject);
+            }
         } else if (METHOD_SETPARAMETERS.equals(invocation.getMethod().getName())) {
-            ParameterHandler handler = (ParameterHandler) PluginUtil.processTarget(invocation.getTarget());
+            ParameterHandler handler = (ParameterHandler) PluginUtil
+                .processTarget(invocation.getTarget());
             MetaObject metaObject = SystemMetaObject.forObject(handler);
             MappedStatement ms = (MappedStatement) metaObject.getValue("mappedStatement");
             SqlCommandType sqlCommandType = ms.getSqlCommandType();
@@ -159,6 +164,59 @@ public class ConvertSqlInterceptor implements Interceptor {
         }
 
         return invocation.proceed();
+    }
+
+    private void sqlconvert(Invocation invocation, MetaObject metaObject)
+        throws SQLException {
+        String sql = metaObject.getValue("delegate.boundSql.sql").toString();
+        Connection connection = (Connection) invocation.getArgs()[0];
+        DbType dbType = JdbcUtils.getDbType(connection.getMetaData().getURL());
+        logger.info("jdbc type :{},intercept 原始sql :{} ", dbType, sql);
+
+        switch (dbType) {
+            case MYSQL:
+                if (sql.toUpperCase().contains("TO_CHAR")) {
+                    sql=StringUtil.replaceAll(sql,"TO_CHAR", "DATE_FORMAT");
+                }
+                if (sql.toUpperCase().contains("TO_Date")) {
+                    sql=sql.replaceAll("TO_Date", "str_to_date");
+                }
+                sql=StringUtil.replaceAll(sql,"yyyy", "%Y");
+                sql=StringUtil.replaceAll(sql,"mm", "%m");
+                sql=StringUtil.replaceAll(sql,"dd", "%d");
+                sql=StringUtil.replaceAll(sql,"hh24", "%H");
+                sql=StringUtil.replaceAll(sql,"hh", "%H");
+                sql=StringUtil.replaceAll(sql,"mi", "%i");
+                sql=StringUtil.replaceAll(sql,"ss", "%s");
+
+                break;
+            case MARIADB:
+                break;
+            case ORACLE:
+                break;
+            case DB2:
+                break;
+            case H2:
+                break;
+            case SQL_SERVER:
+                break;
+            case SQL_SERVER2005:
+                break;
+            case POSTGRE_SQL:
+                break;
+            case HSQL:
+                break;
+            case SQLITE:
+                break;
+            case DM:
+                break;
+            default:
+                logger.warn("The Database's Not Supported!");
+                break;
+
+        }
+        logger.debug("intercept 更新sql : " + sql);
+        metaObject.setValue("delegate.boundSql.sql", sql);
     }
 
     /**
@@ -199,8 +257,11 @@ public class ConvertSqlInterceptor implements Interceptor {
         return false;
     }
 
-    private void updateValueWithIndex(int modifyDateColumnIndex, String currentDate, Update update) {
-        update.getExpressions().set(modifyDateColumnIndex, new QuotationTimestampValue(currentDate));
+    private void updateValueWithIndex(int modifyDateColumnIndex, String
+        currentDate, Update
+        update) {
+        update.getExpressions()
+            .set(modifyDateColumnIndex, new QuotationTimestampValue(currentDate));
     }
 
     private void updateValue(String updateDateColumnName, String currentDate, Update update) {
@@ -209,7 +270,8 @@ public class ConvertSqlInterceptor implements Interceptor {
         update.getExpressions().add(new QuotationTimestampValue(currentDate));
     }
 
-    private void intoValueWithIndex(final int index, final String columnValue, Insert insert) {
+    private void intoValueWithIndex(final int index, final String columnValue, Insert
+        insert) {
         // 通过visitor设置对应的值
         insert.getItemsList().accept(new ItemsListVisitor() {
             @Override
@@ -220,14 +282,14 @@ public class ConvertSqlInterceptor implements Interceptor {
             @Override
             public void visit(ExpressionList expressionList) {
                 expressionList.getExpressions()
-                        .set(index, new QuotationTimestampValue(columnValue));
+                    .set(index, new QuotationTimestampValue(columnValue));
             }
 
             @Override
             public void visit(MultiExpressionList multiExpressionList) {
                 for (ExpressionList expressionList : multiExpressionList.getExprList()) {
                     expressionList.getExpressions()
-                            .set(index, new QuotationTimestampValue(columnValue));
+                        .set(index, new QuotationTimestampValue(columnValue));
                 }
             }
         });
@@ -246,14 +308,14 @@ public class ConvertSqlInterceptor implements Interceptor {
             @Override
             public void visit(ExpressionList expressionList) {
                 expressionList.getExpressions()
-                        .add(new QuotationTimestampValue(columnValue));
+                    .add(new QuotationTimestampValue(columnValue));
             }
 
             @Override
             public void visit(MultiExpressionList multiExpressionList) {
                 for (ExpressionList expressionList : multiExpressionList.getExprList()) {
                     expressionList.getExpressions()
-                            .add(new QuotationTimestampValue(columnValue));
+                        .add(new QuotationTimestampValue(columnValue));
                 }
             }
         });
@@ -267,7 +329,8 @@ public class ConvertSqlInterceptor implements Interceptor {
     @Override
     public void setProperties(Properties properties) {
         createDateColumnName = properties.getProperty("createDateColumnName", "gmt_create");
-        updateDateColumnName = properties.getProperty("updateDateColumnName", "gmt_modified");
+        updateDateColumnName = properties
+            .getProperty("updateDateColumnName", "gmt_modified");
         String ignoreTable = properties.getProperty("ignoreTables", "");
         if (ignoreTable.trim().length() > 0) {
             String[] tables = ignoreTable.split(",");

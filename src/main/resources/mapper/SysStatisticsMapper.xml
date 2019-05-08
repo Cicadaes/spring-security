@@ -1,21 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.auth.center.springsecurity.dao.SysStatisticsMapper">
 
-    <!-- 通用查询映射结果 -->
-    <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.SysStatistics">
-        <id column="STATISTICS_ID" property="statisticsId" />
-        <result column="IP" property="ip" />
-        <result column="AREA" property="area" />
-        <result column="OPERATOR" property="operator" />
-        <result column="CDATE" property="cdate" />
-        <result column="CTIME" property="ctime" />
-        <result column="REGION" property="region" />
-    </resultMap>
+  <!-- 通用查询映射结果 -->
+  <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.SysStatistics">
+    <id column="STATISTICS_ID" property="statisticsId"/>
+    <result column="IP" property="ip"/>
+    <result column="AREA" property="area"/>
+    <result column="OPERATOR" property="operator"/>
+    <result column="CDATE" property="cdate"/>
+    <result column="CTIME" property="ctime"/>
+    <result column="REGION" property="region"/>
+  </resultMap>
 
-    <!-- 通用查询结果列 -->
-    <sql id="Base_Column_List">
-        STATISTICS_ID AS statisticsId, IP AS ip, AREA AS area, OPERATOR AS operator, CDATE AS cdate, CTIME AS ctime, REGION AS region
+  <!-- 通用查询结果列 -->
+  <sql id="Base_Column_List">
+        STATISTICS_ID , IP , AREA , OPERATOR , CDATE , CTIME , REGION
     </sql>
 
+  <select id="searchByParam" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List"></include>
+    from SYS_STATISTICS WHERE CDATE> to_date( #{cdate}, 'yyyy-mm-dd hh24:mi:ss' ) AND
+    <![CDATA[
+    CTIMS <
+    to_date(SYSDATE, 'yyyy-mm-dd hh24:mi:ss')
+    ]]>
+
+  </select>
 </mapper>
