@@ -2,6 +2,7 @@ package com.auth.center.springsecurity.plugins;
 
 import com.auth.center.springsecurity.plugins.bean.DbType;
 import com.auth.center.springsecurity.plugins.utils.JdbcUtils;
+import com.auth.center.springsecurity.plugins.utils.MapperProcessorUtil;
 import com.auth.center.springsecurity.plugins.utils.PluginUtil;
 import com.auth.center.springsecurity.plugins.utils.StringUtil;
 import java.sql.Connection;
@@ -41,6 +42,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  * @Intercepts注解表明该类是拦截器，参数是方法签名数组。
@@ -70,6 +72,12 @@ public class ConvertSqlInterceptor implements Interceptor {
      */
     private static List<String> ignoreTableList;
 
+    private static final String SCHEMA_START = "/*!mycat:schema = ";
+    private static final String SCHEMA_END = "*/";
+    @Value("${mycat.using}")
+    private String mycatUsing = "";
+    @Value("${mycat.schema.name}")
+    private String schemaName = "";
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
@@ -175,20 +183,10 @@ public class ConvertSqlInterceptor implements Interceptor {
 
         switch (dbType) {
             case MYSQL:
-                if (sql.toUpperCase().contains("TO_CHAR")) {
-                    sql=StringUtil.replaceAll(sql,"TO_CHAR", "DATE_FORMAT");
+                if (MapperProcessorUtil.isIncludeOracle(sql)) {
+                    logger.info("包含Oracle特有函数");
+                    sql = MapperProcessorUtil.replaceOracleWithMysql(sql);
                 }
-                if (sql.toUpperCase().contains("TO_Date")) {
-                    sql=sql.replaceAll("TO_Date", "str_to_date");
-                }
-                sql=StringUtil.replaceAll(sql,"yyyy", "%Y");
-                sql=StringUtil.replaceAll(sql,"mm", "%m");
-                sql=StringUtil.replaceAll(sql,"dd", "%d");
-                sql=StringUtil.replaceAll(sql,"hh24", "%H");
-                sql=StringUtil.replaceAll(sql,"hh", "%H");
-                sql=StringUtil.replaceAll(sql,"mi", "%i");
-                sql=StringUtil.replaceAll(sql,"ss", "%s");
-
                 break;
             case MARIADB:
                 break;
@@ -213,9 +211,22 @@ public class ConvertSqlInterceptor implements Interceptor {
             default:
                 logger.warn("The Database's Not Supported!");
                 break;
+        }
+        if ("0".equals(mycatUsing)) {
+            if (StringUtil.isEmpty(schemaName)) {
+                logger.error("mycat schema name 未配置");
+
+            } else {
+                if (!sql.startsWith(SCHEMA_START)) {
+                    StringBuilder stringBuilder = new StringBuilder(sql.length() + 400);
+                    sql = stringBuilder.append(SCHEMA_START).append(schemaName).append(SCHEMA_END)
+                        .append(sql).toString();
+                }
+            }
+            logger.info("intercept 更新sql ,增加mycat schema name: " + schemaName);
 
         }
-        logger.debug("intercept 更新sql : " + sql);
+        logger.info("intercept 更新sql : " + sql);
         metaObject.setValue("delegate.boundSql.sql", sql);
     }
 

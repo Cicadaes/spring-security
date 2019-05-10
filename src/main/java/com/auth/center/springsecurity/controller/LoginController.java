@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -83,14 +82,14 @@ public class LoginController {
         SysUser sysUser = sysUserMapper.findByUsername(authenticationRequest.getUsername());
 
         //插入字段默认时间
-        sysUser.setUserId("" + new Random().nextInt(1000));
-        sysUser.setLastpasswordresetdate(null);
-        sysUser.setUsername("name" + new Random().nextInt(1000));
-        sysUserMapper.insert(sysUser);
+//        sysUser.setUserId("" + new Random().nextInt(1000));
+//        sysUser.setLastpasswordresetdate(null);
+//        sysUser.setUsername("name" + new Random().nextInt(1000));
+//        sysUserMapper.insert(sysUser);
         //根据日期查询转换
         Map map = new HashMap<>();
         map.put("cdate", "2019-01-01");
-        map.put("ctime", "2019-01-02 03:04:16");
+        map.put("ctime", "2029-01-02 03:04:16");
         List<SysStatistics> rst = sysStatisticsMapper.searchByParam(map);
         logger.info(String.valueOf(rst.size()));
 

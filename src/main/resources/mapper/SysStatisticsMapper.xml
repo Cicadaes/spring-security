@@ -24,8 +24,8 @@
     <include refid="Base_Column_List"></include>
     from SYS_STATISTICS WHERE CDATE> to_date( #{cdate}, 'yyyy-mm-dd hh24:mi:ss' ) AND
     <![CDATA[
-    CTIMS <
-    to_date(SYSDATE, 'yyyy-mm-dd hh24:mi:ss')
+    CTIME <
+    to_date(#{ctime}, 'yyyy-mm-dd hh24:mi:ss')
     ]]>
 
   </select>
