@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.auth.center.springsecurity.dao.InvoiceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.Invoice">
+        <id column="INVOICE_ID" property="invoiceId" />
+        <result column="INVOICE_YM" property="invoiceYm" />
+        <result column="INVOICE_YMD" property="invoiceYmd" />
+        <result column="SERIAL_NO" property="serialNo" />
+        <result column="INVOICE_TYPE_CODE" property="invoiceTypeCode" />
+        <result column="INVOICE_TERMINAL_CODE" property="invoiceTerminalCode" />
+        <result column="INVOICE_SPECIAL_MARK" property="invoiceSpecialMark" />
+        <result column="SELLER_TAX_NO" property="sellerTaxNo" />
+        <result column="SELLER_NAME" property="sellerName" />
+        <result column="SELLER_ADDRESS_PHONE" property="sellerAddressPhone" />
+        <result column="SELLER_BANK_ACCOUNT" property="sellerBankAccount" />
+        <result column="BUYER_TAX_NO" property="buyerTaxNo" />
+        <result column="BUYER_NAME" property="buyerName" />
+        <result column="BUYER_ADDRESS_PHONE" property="buyerAddressPhone" />
+        <result column="BUYER_BANK_ACCOUNT" property="buyerBankAccount" />
+        <result column="DRAWER" property="drawer" />
+        <result column="PAYEE" property="payee" />
+        <result column="CHECKER" property="checker" />
+        <result column="INVOICE_TYPE" property="invoiceType" />
+        <result column="INVOICE_LIST_MARK" property="invoiceListMark" />
+        <result column="ORIGINAL_INVOICE_CODE" property="originalInvoiceCode" />
+        <result column="ORIGINAL_INVOICE_NO" property="originalInvoiceNo" />
+        <result column="TAXATION_MODE" property="taxationMode" />
+        <result column="DEDUCTIBLE_AMOUNT" property="deductibleAmount" />
+        <result column="INVOICE_TOTAL_PRICE_TAX" property="invoiceTotalPriceTax" />
+        <result column="INVOICE_TOTAL_PRICE" property="invoiceTotalPrice" />
+        <result column="INVOICE_TOTAL_TAX" property="invoiceTotalTax" />
+        <result column="GOODS_CODE_VERSION" property="goodsCodeVersion" />
+        <result column="CONSOLIDATED_TAX_RATE" property="consolidatedTaxRate" />
+        <result column="PRICE_TAX_MARK" property="priceTaxMark" />
+        <result column="REMARKS" property="remarks" />
+        <result column="BUYER_EMAIL" property="buyerEmail" />
+        <result column="BUYER_PHONE" property="buyerPhone" />
+        <result column="BUYER_TYPE" property="buyerType" />
+        <result column="STATUS" property="status" />
+        <result column="INVOICE_CODE" property="invoiceCode" />
+        <result column="INVOICE_NO" property="invoiceNo" />
+        <result column="INVOICE_DATE" property="invoiceDate" />
+        <result column="TAX_CONTROL_CODE" property="taxControlCode" />
+        <result column="FORMAT_FILE_URL" property="formatFileUrl" />
+        <result column="MACHINE_NO" property="machineNo" />
+        <result column="CHECK_SIGN" property="checkSign" />
+        <result column="INVOICE_CHECK_CODE" property="invoiceCheckCode" />
+        <result column="CREATE_USER_ID" property="createUserId" />
+        <result column="CREATE_TIME" property="createTime" />
+        <result column="UPDATE_USER_ID" property="updateUserId" />
+        <result column="UPDATE_TIME" property="updateTime" />
+        <result column="ORG_CODE" property="orgCode" />
+        <result column="RES2" property="res2" />
+        <result column="RES3" property="res3" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        INVOICE_ID AS invoiceId, INVOICE_YM AS invoiceYm, INVOICE_YMD AS invoiceYmd, SERIAL_NO AS serialNo, INVOICE_TYPE_CODE AS invoiceTypeCode, INVOICE_TERMINAL_CODE AS invoiceTerminalCode, INVOICE_SPECIAL_MARK AS invoiceSpecialMark, SELLER_TAX_NO AS sellerTaxNo, SELLER_NAME AS sellerName, SELLER_ADDRESS_PHONE AS sellerAddressPhone, SELLER_BANK_ACCOUNT AS sellerBankAccount, BUYER_TAX_NO AS buyerTaxNo, BUYER_NAME AS buyerName, BUYER_ADDRESS_PHONE AS buyerAddressPhone, BUYER_BANK_ACCOUNT AS buyerBankAccount, DRAWER AS drawer, PAYEE AS payee, CHECKER AS checker, INVOICE_TYPE AS invoiceType, INVOICE_LIST_MARK AS invoiceListMark, ORIGINAL_INVOICE_CODE AS originalInvoiceCode, ORIGINAL_INVOICE_NO AS originalInvoiceNo, TAXATION_MODE AS taxationMode, DEDUCTIBLE_AMOUNT AS deductibleAmount, INVOICE_TOTAL_PRICE_TAX AS invoiceTotalPriceTax, INVOICE_TOTAL_PRICE AS invoiceTotalPrice, INVOICE_TOTAL_TAX AS invoiceTotalTax, GOODS_CODE_VERSION AS goodsCodeVersion, CONSOLIDATED_TAX_RATE AS consolidatedTaxRate, PRICE_TAX_MARK AS priceTaxMark, REMARKS AS remarks, BUYER_EMAIL AS buyerEmail, BUYER_PHONE AS buyerPhone, BUYER_TYPE AS buyerType, STATUS AS status, INVOICE_CODE AS invoiceCode, INVOICE_NO AS invoiceNo, INVOICE_DATE AS invoiceDate, TAX_CONTROL_CODE AS taxControlCode, FORMAT_FILE_URL AS formatFileUrl, MACHINE_NO AS machineNo, CHECK_SIGN AS checkSign, INVOICE_CHECK_CODE AS invoiceCheckCode, CREATE_USER_ID AS createUserId, CREATE_TIME AS createTime, UPDATE_USER_ID AS updateUserId, UPDATE_TIME AS updateTime, ORG_CODE AS orgCode, RES2 AS res2, RES3 AS res3
+    </sql>
+
+</mapper>

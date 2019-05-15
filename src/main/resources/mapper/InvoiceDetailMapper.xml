@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.auth.center.springsecurity.dao.InvoiceDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.auth.center.springsecurity.common.model.InvoiceDetail">
+        <id column="DETAIL_ID" property="detailId" />
+        <result column="INVOICE_ID" property="invoiceId" />
+        <result column="INVOICE_YM" property="invoiceYm" />
+        <result column="INVOICE_YMD" property="invoiceYmd" />
+        <result column="GOODS_LINE_NO" property="goodsLineNo" />
+        <result column="GOODS_LINE_NATURE" property="goodsLineNature" />
+        <result column="GOODS_CODE" property="goodsCode" />
+        <result column="GOODS_EXTEND_CODE" property="goodsExtendCode" />
+        <result column="GOODS_NAME" property="goodsName" />
+        <result column="GOODS_TAX_ITEM" property="goodsTaxItem" />
+        <result column="GOODS_SPECIFICATION" property="goodsSpecification" />
+        <result column="GOODS_UNIT" property="goodsUnit" />
+        <result column="GOODS_QUANTITY" property="goodsQuantity" />
+        <result column="GOODS_PRICE" property="goodsPrice" />
+        <result column="GOODS_TOTAL_PRICE" property="goodsTotalPrice" />
+        <result column="GOODS_TOTAL_TAX" property="goodsTotalTax" />
+        <result column="GOODS_TAX_RATE" property="goodsTaxRate" />
+        <result column="GOODS_DISCOUNT_LINE_NO" property="goodsDiscountLineNo" />
+        <result column="VAT_SPECIAL_MANAGEMENT" property="vatSpecialManagement" />
+        <result column="FREE_TAX_MARKL" property="freeTaxMarkl" />
+        <result column="PREFERENTIAL_MARK" property="preferentialMark" />
+        <result column="UPDATE_USER_ID" property="updateUserId" />
+        <result column="UPDATE_TIME" property="updateTime" />
+        <result column="CREATE_USER_ID" property="createUserId" />
+        <result column="CREATE_TIME" property="createTime" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        DETAIL_ID AS detailId, INVOICE_ID AS invoiceId, INVOICE_YM AS invoiceYm, INVOICE_YMD AS invoiceYmd, GOODS_LINE_NO AS goodsLineNo, GOODS_LINE_NATURE AS goodsLineNature, GOODS_CODE AS goodsCode, GOODS_EXTEND_CODE AS goodsExtendCode, GOODS_NAME AS goodsName, GOODS_TAX_ITEM AS goodsTaxItem, GOODS_SPECIFICATION AS goodsSpecification, GOODS_UNIT AS goodsUnit, GOODS_QUANTITY AS goodsQuantity, GOODS_PRICE AS goodsPrice, GOODS_TOTAL_PRICE AS goodsTotalPrice, GOODS_TOTAL_TAX AS goodsTotalTax, GOODS_TAX_RATE AS goodsTaxRate, GOODS_DISCOUNT_LINE_NO AS goodsDiscountLineNo, VAT_SPECIAL_MANAGEMENT AS vatSpecialManagement, FREE_TAX_MARKL AS freeTaxMarkl, PREFERENTIAL_MARK AS preferentialMark, UPDATE_USER_ID AS updateUserId, UPDATE_TIME AS updateTime, CREATE_USER_ID AS createUserId, CREATE_TIME AS createTime
+    </sql>
+
+</mapper>
