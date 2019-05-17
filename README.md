@@ -1,5 +1,8 @@
 # spring-security
 
+基于spring-security+jwt实现授权认证；
+
+##开始
 1、导入db下脚本；
 2、修改mysql redis 配置信息
 3、启动 SpringSecurityApplication
