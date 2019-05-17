@@ -1,9 +1,7 @@
 package com.auth.center.springsecurity.config;
 
-import com.auth.center.springsecurity.plugins.ConvertSqlInterceptor;
-import com.auth.center.springsecurity.plugins.utils.DbUtils;
+import com.baiwang.mybatisx.sqlconverter.plugins.ConvertSqlInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
-import java.util.Properties;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,26 +21,10 @@ public class MybatisPlusConfig {
         return new PaginationInterceptor();
     }
 
+    @Bean
+    public ConvertSqlInterceptor convertSqlInterceptor() {
+        //tenantEnable true 开启多租户过滤，false 关闭多租户过滤；值可以放到配置中心去获取
+        return new ConvertSqlInterceptor(true);
+    }
 
-    @Bean
-    public ConvertSqlInterceptor addDateInterceptor() {
-        ConvertSqlInterceptor myPlugin = new ConvertSqlInterceptor();
-        //设置参数，比如阈值等，可以在配置文件中配置，这里直接写死便于测试
-        Properties properties = new Properties();
-        properties.setProperty("createDateColumnName", "LASTPASSWORDRESETDATE");
-        properties.setProperty("updateDateColumnName", "LASTPASSWORDRESETDATE");
-        properties.setProperty("ignoreTables", "SYS_ROLE");
-        myPlugin.setProperties(properties);
-        return myPlugin;
-    }
-    @Bean
-    public DbUtils dbUtils() {
-        DbUtils dbUtils = new DbUtils();
-        //设置参数，比如阈值等，可以在配置文件中配置，这里直接写死便于测试
-        Properties properties = new Properties();
-        properties.setProperty("createDateColumnName", "LASTPASSWORDRESETDATE");
-        properties.setProperty("updateDateColumnName", "LASTPASSWORDRESETDATE");
-        properties.setProperty("ignoreTables", "SYS_ROLE");
-        return dbUtils;
-    }
 }
