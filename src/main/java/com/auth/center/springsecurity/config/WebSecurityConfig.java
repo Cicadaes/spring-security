@@ -74,6 +74,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers("/auth/**").permitAll()
             .antMatchers("/ticket/**").permitAll()
             .antMatchers("/druid/**").permitAll()
+            .antMatchers("/map/**").permitAll()
             .anyRequest().authenticated();
 
        httpSecurity

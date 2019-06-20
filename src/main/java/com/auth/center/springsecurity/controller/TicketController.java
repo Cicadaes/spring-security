@@ -2,8 +2,9 @@ package com.auth.center.springsecurity.controller;
 
 
 import com.auth.center.springsecurity.common.model.R;
-import com.auth.center.springsecurity.common.model.SysStatistics;
+import com.auth.center.springsecurity.common.model.Ticket;
 import com.auth.center.springsecurity.dao.SysStatisticsMapper;
+import com.auth.center.springsecurity.dao.TicketMapper;
 import com.baiwang.mybatisx.sqlconverter.plugins.utils.SessionUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import java.util.HashMap;
@@ -30,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class TicketController {
     @Autowired
     private SysStatisticsMapper sysStatisticsMapper;
+    @Autowired
+    private TicketMapper ticketMapper;
 
     @GetMapping("/setdb/{sess}")
     @ResponseBody
@@ -43,9 +46,9 @@ public class TicketController {
     @GetMapping("/list")
     public R list(){
         Map map = new HashMap<>();
-        map.put("cdate", "2019-01-01");
+        map.put("cdate", "2017-01-01 03:04:16");
         map.put("ctime", "2029-01-02 03:04:16");
-        List<SysStatistics> rst = sysStatisticsMapper.searchByParam(map);
+        List<Ticket> rst = ticketMapper.searchByParam(map);
         return new R(rst);
     }
 
@@ -53,7 +56,11 @@ public class TicketController {
     public R count(){
         Map<String, Object> query = new HashMap<>(16);
         QueryWrapper ew = new QueryWrapper<>();
-        return new R(sysStatisticsMapper.selectCount(ew));
+        return new R(ticketMapper.selectCount(ew));
+    }
+    @GetMapping("/insert")
+    public R insert(){
+        return new R(ticketMapper.insertData());
     }
 }
 

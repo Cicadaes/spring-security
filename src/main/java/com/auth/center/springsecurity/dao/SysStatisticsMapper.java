@@ -17,4 +17,6 @@ import java.util.Map;
 public interface SysStatisticsMapper extends BaseMapper<SysStatistics> {
 
     List<SysStatistics> searchByParam(Map map);
+
+    int insertData();
 }

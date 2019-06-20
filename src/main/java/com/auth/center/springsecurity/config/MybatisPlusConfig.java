@@ -24,7 +24,7 @@ public class MybatisPlusConfig {
     @Bean
     public ConvertSqlInterceptor convertSqlInterceptor() {
         //tenantEnable true 开启多租户过滤，false 关闭多租户过滤；值可以放到配置中心去获取
-        return new ConvertSqlInterceptor(true);
+        return new ConvertSqlInterceptor(false);
     }
 
 }
